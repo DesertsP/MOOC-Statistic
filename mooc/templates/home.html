@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script src="{% static 'js/highcharts-more.js' %}"></script>
+    <script src="{% static 'js/exporting.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container">
+            <div class="ui stackable very relaxed center aligned grid container">
+                <div class="row">
+                    <div class="twelve wide column">
+                        <div class="header"><h1 class="ui header">慕课</h1></div>
+                        <div class="quote">
+                            <p class="quote-text animate-init">
+                                一种全新的教育学习方式，正在席卷全球.<br/>
+                            </p>
+                            <p class="quote-text animate-init">
+                                每一个有提升愿望的人
+                                <br/>都可以在线学习全球最好的课程.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row animate-init">
+                    <div class="eight wide column">
+                        <div id="timeline"></div>
+                    </div>
+                    <div class="seven wide column chart-description">
+                        <div class="ui statistic">
+                            <div class="label"><br/>至今已有</div>
+                            <div class="value">{{ count_total }}</div>
+                            <div class="label">门课程.</div>
+                        </div>
+                        <p>2012开始，慕课经历了爆发式增长</p>
+                        <p>平均每个月大约有<b>200+</b>门新课程上线，<br/>同时，已有课程不断更新开课.</p>
+                    </div>
+
+                </div>
+                <div class="ui divider"></div>
+                <div class="row animate-init">
+                    <div class="seven wide column chart-description">
+                        <div class="ui statistic">
+                            <div class="label"><br/>  包含</div>
+                            <div class="value">{{ dp_count }}</div>
+                            <div class="label">个学科/微专业.</div>
+                        </div>
+                        <p>慕课课程的范围不仅覆盖了广泛的科技学科，<br/>
+                            比如数学、统计、计算机科学、自然科学和工程学，<br/>
+                            也包括了社会科学和人文学科.</p>
+                    </div>
+                    <div class="eight wide column">
+                        <div id="department"></div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="row animate-init">
+                    <div class="eight wide column">
+                        <div id="price"></div>
+                    </div>
+                    <div class="seven wide column chart-description">
+                        <div class="ui statistic">
+                            <div class="label"><br/>免费课程</div>
+                            <div class="value">{{ free_percent }}</div>
+                            <div class="label">占比</div>
+                        </div>
+                        <p>虽然部分慕课/在线职业教育在朝着商业化发展，<br/>
+                            免费的优质的课程依然是慕课的主力.
+                            <br/>大部分慕课仍以免费上课与付费证书并行的模式运行.
+                        </p>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="row animate-init">
+                    <div class="seven wide column chart-description">
+                        <div class="ui statistic">
+                            <div class="label"><br/>7+高分课程</div>
+                            <div class="value">{{ high_grading_per }}</div>
+                            <div class="label">占比</div>
+                        </div>
+                        <p>免费≠低质<br/> 大部分慕课平均评分在7分以上，更有大量超高分课程<sup>*</sup>.</p>
+                        <p>*此处不包含评分数量不足的课程.</p>
+                    </div>
+                    <div class="eight wide column">
+                        <div id="grading"></div>
+                    </div>
+                </div>
+{#                <div class="ui divider"></div>#}
+            </div>
+            <div class="ui divider"></div>
+            <div class="ui three column center aligned divided very relaxed stackable grid container animate-init">
+                <div class="row">
+                    <div class="column">
+                        <h2 class="ui icon header">
+                            <img class="ui icon image" src="{% static 'images/lab.png' %}">
+                            高分好课
+                        </h2>
+                        <p>用户评分在9分以上，大牛亲授的神级课程</p>
+                        <a class="ui button" href="/grading">前去膜拜</a>
+                    </div>
+                    <div class="column">
+                        <h2 class="ui icon header">
+                            <img class="ui icon image" src="{% static 'images/heart.png' %}">
+                            热门关注
+                        </h2>
+                        <p>关注量极高的热门课程和专业</p>
+                        <a class="ui teal button" href="/hot">即刻学习</a>
+                    </div>
+                    <div class="column">
+                        <h2 class="ui icon header">
+                            <img class="ui icon image" src="{% static 'images/rocket.png' %}">
+                            慕课地图
+                        </h2>
+                        <p>世界各地的慕课发展状况及学校地图</p>
+                        <a class="ui button" href="/region">现在去看</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+
+        $(document).ready(function () {
+            var delay = 3;
+            var DELAY_STEP = 400;
+            var animationOptions = {opacity: 1, top: 0};
+
+            $('h1').animate(animationOptions).promise()
+                    .pipe(animateMain)
+
+            function animateMain() {
+                var dfd = $.Deferred();
+                var els = $('.animate-init');
+                var size = els.size();
+
+                els.each(function (index, el) {
+                    delay++;
+                    $(el).delay(index * DELAY_STEP)
+                            .animate(animationOptions);
+                    (size - 1 === index) && dfd.resolve();
+                });
+                return dfd.promise();
+            }
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $('#timeline').highcharts({
+                title: {
+                    text: '慕课数量增长趋势图'
+                },
+                xAxis: {
+                    categories: ['2012/12', '2013/06', '2013/12', '2014/06', '2014/12', '2015/06', '2015/12', '2016/06', '今天']
+                },
+                yAxis: {
+                    title: {
+                        text: ' '
+                    }
+                },
+                series: [{
+                    colorByPoint: true,
+                    type: 'column',
+                    showInLegend: false,
+                    name: '累计课程数',
+                    data: [{% for n in increments %}{{ n }}, {% endfor %}]
+                }, {
+                    type: 'spline',
+                    name: '累计课程数',
+                    showInLegend: false,
+                    data: [{% for n in increments %}{{ n }}, {% endfor %}],
+                    marker: {
+                        lineWidth: 4,
+                        lineColor: Highcharts.getOptions().colors[9],
+                        fillColor: 'white'
+                    }
+                },]
+            });
+        });
+
+
+    </script>
+    <script>
+        $(function () {
+            $('#price').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+                title: {
+                    text: 'Browser<br>shares<br>2015',
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    y: 40
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        dataLabels: {
+                            enabled: true,
+                            distance: -40,
+                            style: {
+                                fontWeight: 'bold',
+                                fontSize: '1.1em',
+                            }
+                        },
+                        startAngle: -90,
+                        endAngle: 90,
+                        center: ['50%', '75%']
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: '课程数量比例',
+                    innerSize: '50%',
+                    data: [
+                        {% for n, p in price_credit_count %}
+                            ['{{ p }}', {{ n }}],
+                        {% endfor %}
+                    ]
+                }]
+            });
+        });
+
+    </script>
+    <script>
+        $(function () {
+
+            $(document).ready(function () {
+                $('#department').highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: '各专业慕课(含职业课程)数量比例分析'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true
+                            },
+                            showInLegend: false
+                        }
+                    },
+                    series: [{
+                        name: '慕课数量比例',
+                        colorByPoint: true,
+                        data: [{% for n, d in department_course_count %}{
+                            name: '{{ d }}',
+                            y: {{ n }}
+                            },{% endfor %}]
+                    }]
+                });
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            // Create the chart
+            $('#grading').highcharts({
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: '关注量过万的慕课用户评分统计'
+                },
+                subtitle: {
+                    text: '数据来源: <a href="http://mooc.guokr.com">果壳慕课</a> |  截止日期: 2016/10'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: '课程数量'
+                    }
+
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y}'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}门课程</b><br/>'
+                },
+
+                series: [{
+                    name: '评分',
+                    colorByPoint: true,
+                    data: [{% for n, g in grading_count %}{
+                        name: '{{ g }}分+',
+                        y: {{ n }},
+                        },{% endfor %}]
+                }],
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $('#school_timeline').highcharts({
+                title: {
+                    text: '开设慕课的学校数量增长趋势'
+                },
+                xAxis: {
+                    title: {
+                        text: '年份'
+                    },
+                    categories: [{% for _, y in school_time_line %}'{{ y }}',{% endfor %}]
+                },
+                labels: {
+                    items: [{
+                        html: '',
+                        style: {
+                            left: '80px',
+                            top: '10px',
+                            color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                        }
+                    }]
+                },
+                yAxis: {
+                    title: {
+                        text: '学校数量'
+                    }
+                },
+                series: [{
+                    type: 'column',
+                    name: '累计数量',
+                    colorByPoint: true,
+                    data: [{% for n, _ in school_time_line %}{{ n }}, {% endfor %}],
+                    showInLegend: false,
+                }, {
+                    type: 'spline',
+                    name: '累计数量',
+                    data: [{% for n, _ in school_time_line %}{{ n }}, {% endfor %}],
+                    marker: {
+                        lineWidth: 2,
+                        lineColor: Highcharts.getOptions().colors[6],
+                        fillColor: 'white'
+                    },
+                    showInLegend: false,
+                }, {
+                    type: 'pie',
+                    name: '当年新增数量',
+                    data: [{% for n, y in school_year_counts %}{
+                        name: '{{ y }}',
+                        y: {{ n }},
+                        }, {% endfor %}],
+                    center: [100, 80],
+                    size: 100,
+                    showInLegend: false,
+
+                }]
+            });
+        });
+
+    </script>
+
+{% endblock %}

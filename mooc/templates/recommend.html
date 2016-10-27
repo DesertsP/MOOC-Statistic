@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container">
+            <div id="recommend-content">
+                {% if show_login %}
+                    <div class="ui stackable very relaxed center aligned grid container">
+                        <div class="row animate-init">
+                            <div class="six wide column">
+                                <form class="ui form" action="/recommend" method="post">
+                                    {% csrf_token %}
+                                    <div class="field">
+                                        <label>学号</label>
+                                        <input name="user" type="text">
+                                    </div>
+                                    <div class="field">
+                                        <label>密码</label>
+                                        <input name="password" type="password">
+                                    </div>
+                                    <div class="field">
+                                        <label>院校</label>
+                                        <select class="ui dropdown" name="school">
+                                            <option value="">下拉选择所在院校</option>
+                                            <option value="ysu">燕山大学</option>
+                                            <option value="ysu">其他院校请联系我们适配</option>
+                                        </select>
+                                    </div>
+                                    <div class="ui teal message">
+                                        <p style="text-align: left">
+                                            请输入您的教务系统登录信息,<br> 我们将根据您的课表为您生成推荐.
+                                        </p>
+                                    </div>
+                                    <div class="inline field">
+                                        <div class="ui checkbox">
+                                            <input type="checkbox" name="contract">
+                                            <label id="contract-content"><a>同意用户协议</a></label>
+                                        </div>
+                                    </div>
+                                    <div class="ui submit button">一键获取专属推荐</div>
+                                    <div class="ui error message"></div>
+                                    <div class="ui small modal" id="contract-pop">
+                                        <i class="close icon"></i>
+                                        <div class="header">
+                                            用户协议
+                                        </div>
+                                        <div class="image content">
+                                            <div class="description">
+                                                <div class="ui header">请仔细阅读以下说明.</div>
+                                                <p>1. 本站不保存任何用户信息，所填学号密码均为获取课表所用，
+                                                    关闭本页面后再次使用需要重新填写；</p>
+                                                <p>2. 为方便用户，获取课表时教务系统的验证码由程序自动识别；</p>
+                                                <p>3. 目前仅适配燕山大学本部教务系统，其他院校如有需要请联系我们；</p>
+                                                <p>4. 本站所有数据来自网络，仅做学术研究和学习讨论之用，如有侵权请联系我们删除。</p></li>
+                                                <p>邮箱：<a href="mailto:i@panjunwen.com">i@panjunwen.com</a></p>
+                                            </div>
+                                        </div>
+                                        <div class="actions">
+                                            <div class="ui positive right labeled icon button" id="accept">
+                                                好
+                                                <i class="checkmark icon"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if not show_login %}
+                    <div class="ui stackable very relaxed center aligned grid container">
+                        <div class="row animate-init">
+                            <div class="twelve wide column">
+                                <div class="label">正在生成推荐信息, 请耐心等候…</div>
+                                <br>
+                                <div class="ui teal progress" id="loadprocess">
+                                    <div class="bar">
+                                        <div class="progress"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+
+        $(document).ready(function () {
+            var delay = 3;
+            var DELAY_STEP = 400;
+            var animationOptions = {opacity: 1, top: 0};
+
+            $('h1').animate(animationOptions).promise()
+                    .pipe(animateMain)
+                    .pipe(animateLocationIcon);
+
+            function animateMain() {
+                var dfd = $.Deferred();
+                var els = $('.animate-init');
+                var size = els.size();
+
+                els.each(function (index, el) {
+                    delay++;
+                    $(el).delay(index * DELAY_STEP)
+                            .animate(animationOptions);
+                    (size - 1 === index) && dfd.resolve();
+                });
+                return dfd.promise();
+            }
+
+            function animateLocationIcon() {
+                $('.location-icon').delay(delay * DELAY_STEP).animate({
+                    opacity: 1,
+                    top: 0
+                }).promise().done(animationQuote);
+            }
+
+            function animationQuote() {
+            }
+
+        });
+
+    </script>
+    <script>
+        $('.six.wide.column form')
+                .form({
+                    on: 'blur',
+                    fields: {
+                        user: {
+                            identifier: 'user',
+                            rules: [
+                                {
+                                    type: 'empty',
+                                    prompt: '请输入学号！'
+                                }
+                            ]
+                        }, password: {
+                            identifier: 'password',
+                            rules: [
+                                {
+                                    type: 'empty',
+                                    prompt: '请输入教务系统密码！'
+                                }
+                            ]
+                        },
+                        school: {
+                            identifier: 'school',
+                            rules: [
+                                {
+                                    type: 'empty',
+                                    prompt: '请选择院校！'
+                                }
+                            ]
+                        },
+                        contract: {
+                            identifier: 'contract',
+                            rules: [
+                                {
+                                    type: 'checked',
+                                    prompt: '请勾选同意用户协议！'
+                                }
+                            ]
+                        }
+                    }
+                })
+        ;
+    </script>
+    <script>
+        $("#accept").click(function () {
+            $("[name='contract']").attr("checked", 'true');
+
+        });
+        $('#contract-content').click(function () {
+            $('#contract-pop').modal('show');
+        });
+    </script>
+    {% if not show_login %}
+        <script type="text/javascript">
+            $(function () {
+                var xmlhttp;
+                if (window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                }
+                else {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        increment();
+                        setTimeout(function(){document.getElementById("recommend-content").innerHTML = xmlhttp.responseText;},400)
+                        setTimeout(detail, 500);
+                    }
+                };
+                increment();
+                xmlhttp.open("GET", "/recourses?school={{ school }}&user={{ user }}&password={{ password }}", true);
+                xmlhttp.send();
+                increment();
+            });
+        </script>
+        <script>
+            function detail() {
+                $('.detail').click(function () {
+                    $('#' + this.id + '-modal').modal('show');
+                });
+            }
+            $('.message .close')
+                    .on('click', function () {
+                        $(this)
+                                .closest('.message')
+                                .transition('fade')
+                        ;
+                    })
+            ;
+            function increment() {
+                $('#loadprocess').progress('increment');
+            }
+            $('#loadprocess').progress({total: 3});
+        </script>
+    {% endif %}
+{% endblock %}

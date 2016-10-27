@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script src="{% static 'js/highcharts-more.js' %}"></script>
+    <script src="{% static 'js/exporting.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container">
+            {% if not courses.has_previous %}
+                <div class="ui stackable four column grid">
+                    <div class="column">
+                        <div class="ui blue segment">
+                            <div class="ui statistic">
+                                <div class=" value">
+                                    {{ count }}
+                                </div>
+                                <div class="label">
+                                    评分9+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui purple segment">
+                            <div class="ui statistic">
+                                <div class=" value">
+                                    {{ two_years_ago }}%
+                                </div>
+                                <div class="label">
+                                    创建时间2年+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui teal segment">
+                            <div class="ui statistic">
+                                <div class="value">
+                                    {{ avg_follow }}
+                                </div>
+                                <div class="label">
+                                    平均关注量
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui red segment">
+                            <div class="ui statistic">
+                                <div class="value">
+                                    {{ zh_count }}
+                                </div>
+                                <div class="label">
+                                    中文授课
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="ui divider"></div>
+                <div class="ui stackable very relaxed center aligned grid container">
+                    <div class="row">
+                        <div class="nine wide column">
+                            <div class="ui container" id="col1"></div>
+                        </div>
+                        <div class="seven wide column chart-description">
+                            <h2 class="ui title">慕课用户最关心什么？</h2>
+                            <p>我们统计了用户评分大等于9分的课程<sup>*</sup>.
+                                <br/><br/>在这些课程的评论标签中，<br/>出现频次最高的是<b>讲解清楚</b>.
+                                <br/>用户最关心的还有"老师"、"作业"、"内容"等.
+                                <br/>此外，可以看出入门级的课程更容易被评高分。
+                            </p>
+                            <p>
+                                <sub>*统计来自单一平台，课程评分及评论标签受地区等因素影响较大</sub>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="seven wide column chart-description">
+                            <h2 class="ui title">高分课程 ≈ 经典老课？</h2>
+                            <p>通过统计发现，超过一半的高分课程在三年前已经上线.
+                                <br/>两年前上线的高分课程占到了高分课程的90+%.</p>
+                            <p>由此基本可以了解，那些持续开设更新的慕课往往都是好课.</p>
+                        </div>
+                        <div class="nine wide column">
+                            <div class="ui container" style="height:400px; margin-top: 2em" id="pie2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui divider"></div>
+            {% endif %}
+            <div class="ui stackable four column grid course-list">
+                {% for course in courses %}
+                    <div class="course column">
+                        <div class="ui segment with-tags">
+                            <div class="ui items">
+                                <div class="ui small teal right ribbon label">
+                                    {{ course.grading }}
+                                    <i class="star icon"></i>
+                                    {{ course.followers_count }}
+                                    <i class="heart icon"></i>
+                                    <span class="ui-icon-blank"></span>
+                                </div>
+                                <div class="ui small top left attached label">
+                                    {{ course.get_department }}
+                                </div>
+                                <div class="course item">
+                                    <div class="content">
+                                        <a class="detail" id="{{ course.pk }}">
+                                            <h3 class="ui dividing header">
+                                                {% if course.chinese_name %}
+                                                    {{ course.chinese_name }}
+                                                {% else %}
+                                                    {{ course.name }}
+                                                {% endif %}
+                                            </h3>
+                                        <div class="description">
+                                            <img src="{{ course.icon_url }}"/>
+                                        </div>
+                                        </a>
+                                        <div class="ui divider"></div>
+                                        <div class="text-center">
+                                            <div class="item school-name">
+                                                <i class="university icon"></i>
+                                                {{ course.school }}
+
+                                            </div>
+                                        </div>
+                                        <div class="extra">
+                                            <div class="ui labels">
+                                                {% for count, tag in course.get_tag_top %}
+                                                    <div class="ui label">
+                                                        {{ tag }}{{ count }}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="ui modal" id="{{ course.pk }}-modal">
+                                            <i class="close icon"></i>
+                                            <div class="header">
+                                                {{ course.name }} 课程简介
+                                            </div>
+                                            <div class="image content">
+                                                <div class="ui medium image">
+                                                    <img src="{{ course.icon_url }}">
+                                                </div>
+                                                <div class="description">
+                                                    <p>
+                                                        <b>平台: </b>{{ course.platform }}&nbsp;|&nbsp;
+                                                        <b>难度: </b>{{ course.get_difficulty_display }}&nbsp;|&nbsp;
+                                                        <b>教师: </b>
+                                                        {% for t in course.teachers.all.distinct %}
+                                                            {{ t }} &nbsp;&nbsp;
+                                                        {% endfor %}
+                                                    </p>
+                                                    <div class="ui divider"></div>
+                                                    <p>{{ course.introduction | truncatechars_html:300 | safe }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="actions">
+                                                <div class="ui black deny button">
+                                                    不感兴趣
+                                                </div>
+                                                <a href="{{ course.url }}" target="_blank">
+                                                    <div class="ui positive right labeled icon button">
+                                                        恩, 我去看看
+                                                        <i class="checkmark icon"></i>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if courses.paginator.num_pages > 1 %}
+            <div class="paginator">
+                <div class="ui pagination menu">
+                    {% if courses.has_previous %}
+                        <a href="?page={{ courses.previous_page_number }}" class="item">
+                            <i class="chevron left icon"></i>
+                        </a>
+                    {% else %}
+                        <a class="disabled item">
+                            <i class="chevron left icon"></i>
+                        </a>
+                    {% endif %}
+                    {% if courses.paginator.num_pages > 3 %}
+                        <a href="?page=1" class="item">
+                            1
+                        </a>
+                        <a href="?page=2" class="item">
+                            2
+                        </a>
+                        <a class="disabled item">
+                            ...
+                        </a>
+                        <a href="?page={{ courses.paginator.num_pages }}" class="item">
+                            {{ courses.paginator.num_pages }}
+                        </a>
+                    {% else %}
+                        <a class="disabled item">
+                            ...
+                        </a>
+                    {% endif %}
+
+                    {% if courses.has_next %}
+                        <a href="?page={{ courses.next_page_number }}" class="item">
+                            <i class="chevron right icon"></i>
+                        </a>
+                    {% else %}
+                        <a class="disabled item">
+                            <i class="chevron right icon"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            // Create the chart
+            $('#col1').highcharts({
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: '高分课程评论标签TOP10统计'
+                },
+                subtitle: {
+                    text: '数据来源: <a href="http://mooc.guokr.com">果壳慕课</a> |  截止日期: 2016/10'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: '标签数量'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y}'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}个标签</b><br/>'
+                },
+
+                series: [{
+                    name: '标签数',
+                    colorByPoint: true,
+                    data: [{% for n, t in tag_counts %}{
+                        name: '{{ t }}',
+                        y: {{ n }},
+                        },{% endfor %}]
+                }],
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $('#pie2').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: true,
+                    type: 'pie'
+                },
+                title: {
+                    text: '高分课程首次开课时间分析'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: '比例',
+                    colorByPoint: true,
+                    data: [{% for n, y in count_years %}{
+                        name: '{{ y }}',
+                        y: {{ n }}
+                        },{% endfor %}]
+                }]
+            });
+        });
+    </script>
+    <script>
+        $('.detail').click(function () {
+            $('#' + this.id + '-modal').modal('show');
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container">
+            <div class="ui stackable very relaxed center aligned grid container">
+                <div class="row">
+                    <div class="twelve wide column">
+                        <div class="header"><h1 class="ui header">关于我们</h1></div>
+                        <div class="quote">
+                            <p class="quote-text animate-init">
+                                这是几个大三学生的数据库原理及应用课程的练习项目.<br/>
+                            </p>
+                            <p class="quote-text animate-init">
+                                所有信息来自互联网，由程序自动收集整理.
+                                <br/>
+                                本站使用Django开发，采用Semantic UI进行前端设计，
+                                <br/>
+                                所有图表由Highcharts及Highmaps动态生成.
+                                <br/>
+                                在DigitalOcean的VPS上托管.
+                                <br/>
+                            </p>
+                            <p class="quote-text animate-init">
+                                虽然只是一次作业，但我们希望她能产生一点点价值.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            var delay = 3;
+            var DELAY_STEP = 400;
+            var animationOptions = {opacity: 1, top: 0};
+
+            $('h1').animate(animationOptions).promise()
+                    .pipe(animateMain)
+
+            function animateMain() {
+                var dfd = $.Deferred();
+                var els = $('.animate-init');
+                var size = els.size();
+
+                els.each(function (index, el) {
+                    delay++;
+                    $(el).delay(index * DELAY_STEP)
+                            .animate(animationOptions);
+                    (size - 1 === index) && dfd.resolve();
+                });
+                return dfd.promise();
+            }
+        });
+
+    </script>
+{% endblock %}

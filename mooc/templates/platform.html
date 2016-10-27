@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script src="{% static 'js/highcharts-more.js' %}"></script>
+    <script src="{% static 'js/exporting.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container">
+            <div class="ui stackable four column grid">
+                <div class="column">
+                    <div class="ui blue segment">
+                        <div class="ui statistic">
+                            <div class=" value">
+                                {{ count_total }}
+                            </div>
+                            <div class="label">
+                                课程
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui purple segment">
+                        <div class="ui statistic">
+
+                            <div class="value">
+                                {{ zh_total }}
+                            </div>
+                            <div class="label">
+                                中文课程
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui teal segment">
+                        <div class="ui statistic">
+
+                            <div class="value">
+                                {{ dp_count }}
+                            </div>
+                            <div class="label">
+                                学科
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui red segment">
+                        <div class="ui statistic">
+
+                            <div class="value">
+                                {{ school_count }}
+                            </div>
+                            <div class="label">
+                                学校
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="ui divider"></div>
+            <div class="ui stackable two column grid">
+                <div class="column">
+                    <div class="ui container" style="height:400px" id="timeline">
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui container" style="height:400px" id="timeline_plot">
+                    </div>
+                </div>
+
+            </div>
+            <div class="ui stackable two column grid">
+                <div class="column">
+                    <div class="ui container" style="height:400px" id="pie1">
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui container" style="height:400px" id="pie2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            $('#pie1').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: true,
+                    type: 'pie'
+                },
+                title: {
+                    text: '慕课平台课程数量分析',
+                },
+                subtitle: {
+                    text: '数据来源: <a href="http://mooc.guokr.com">果壳慕课</a> |  截止日期: 2016/10'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: '慕课平台',
+                    colorByPoint: true,
+                    data: [{% for n, p in platform_course_count_1 %}{
+                        name: '{{ p }}',
+                        y: {{ n }}
+                        },{% endfor %}]
+                }],
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $('#pie2').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: true,
+                    type: 'pie'
+                },
+                title: {
+                    text: '职业课程平台课程数量分析'
+                },
+                subtitle: {
+                    text: '数据来源: <a href="http://mooc.guokr.com">果壳慕课</a> |  截止日期: 2016/10'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: '慕课平台',
+                    colorByPoint: true,
+                    data: [{% for n, p in platform_course_count_2 %}{
+                        name: '{{ p }}',
+                        y: {{ n }}
+                        },{% endfor %}]
+                }]
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $('#timeline').highcharts({
+                title: {
+                    text: '慕课逐年累计数量分析'
+                },
+                subtitle: {
+                    text: '数据来源: <a href="http://mooc.guokr.com">果壳慕课</a> |  截止日期: 2016/10'
+                },
+                xAxis: {
+                    title: {
+                        text: '年份'
+                    },
+                    categories: [{% for _, y in time_line %}'{{ y }}',{% endfor %}]
+                },
+                labels: {
+                    items: [{
+                        html: '',
+                        style: {
+                            left: '80px',
+                            top: '10px',
+                            color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                        }
+                    }]
+                },
+                yAxis: {
+                    title: {
+                        text: '课程数量'
+                    }
+                },
+                series: [{
+                    type: 'column',
+                    name: '累计数量',
+                    colorByPoint: true,
+                    data: [{% for n, _ in time_line %}{{ n }}, {% endfor %}],
+                    showInLegend: false,
+                },
+                    {
+                        type: 'pie',
+                        name: '当年新增课程数量',
+                        data: [{% for n, y in year_counts %}{
+                            name: '{{ y }}',
+                            y: {{ n }},
+                            }, {% endfor %}],
+                        center: [100, 80],
+                        size: 100,
+                        showInLegend: false,
+
+                    },]
+            });
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $('#timeline_plot').highcharts({
+                xAxis: {
+                    title: {
+                        text: '年份'
+                    },
+                    categories: [{% for _, y in school_time_line %}'{{ y }}',{% endfor %}]
+                },
+                yAxis: {
+                    title: {
+                        text: '课程数量'
+                    }
+                },
+                title: {
+                    text: '慕课总量逐年回归曲线分析'
+                },
+                subtitle: {
+                    text: '{{ formula }}'
+                },
+                series: [{
+                    type: 'spline',
+                    name: '回归曲线',
+                    data: [{% for n,_ in estimate %}{{ n }}, {% endfor %}],
+                    marker: {
+                        enabled: false
+                    },
+                    states: {
+                        hover: {
+                            lineWidth: 0
+                        }
+                    },
+                    showInLegend: false,
+                    enableMouseTracking: false
+                }, {
+                    type: 'scatter',
+                    name: '累计课程量',
+                    data: [{% for n, _ in time_line %}{{ n }}, {% endfor %}],
+                    showInLegend: false,
+                    marker: {
+                        radius: 4
+                    }
+                }]
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $('#school_timeline').highcharts({
+                title: {
+                    text: '开设慕课的学校数量增长趋势'
+                },
+                xAxis: {
+                    title: {
+                        text: '年份'
+                    },
+                    categories: [{% for _, y in school_time_line %}'{{ y }}',{% endfor %}]
+                },
+                labels: {
+                    items: [{
+                        html: '',
+                        style: {
+                            left: '80px',
+                            top: '10px',
+                            color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                        }
+                    }]
+                },
+                yAxis: {
+                    title: {
+                        text: '学校数量'
+                    }
+                },
+                series: [{
+                    type: 'column',
+                    name: '累计数量',
+                    colorByPoint: true,
+                    data: [{% for n, _ in school_time_line %}{{ n }}, {% endfor %}],
+                    showInLegend: false,
+                }, {
+                    type: 'spline',
+                    name: '累计数量',
+                    data: [{% for n, _ in school_time_line %}{{ n }}, {% endfor %}],
+                    marker: {
+                        lineWidth: 2,
+                        lineColor: Highcharts.getOptions().colors[6],
+                        fillColor: 'white'
+                    },
+                    showInLegend: false,
+                }, {
+                    type: 'pie',
+                    name: '当年新增数量',
+                    data: [{% for n, y in school_year_counts %}{
+                        name: '{{ y }}',
+                        y: {{ n }},
+                        }, {% endfor %}],
+                    center: [100, 80],
+                    size: 100,
+                    showInLegend: false,
+
+                }]
+            });
+        });
+
+    </script>
+
+{% endblock %}

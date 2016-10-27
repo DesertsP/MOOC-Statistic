@@ -1,0 +1,214 @@
+@media (max-width: 767px) {
+    div.course.item > div > a > div.description > img {
+        width: 100%;
+        max-height: 200px;
+        height: auto;
+    }
+}
+
+@media screen and (min-width: 720px){
+    div.ui.stackable.very.relaxed.center.aligned.grid.container > div.row > div.seven.wide.column.chart-description{
+        text-align: left;
+        padding-top: 5em;
+        padding-left: 5em;
+    }
+    div.course.item > div > a > div.description > img {
+        width: 230px;
+        height: 140px;
+    }
+    div.ui.vertical.stripe.segment > div.ui.container > div > div.course.column{
+        width: 20.5em;
+        height: 33em;
+    }
+
+    div.ui.vertical.stripe.segment > div.ui.container > div > div.course.column > div.ui.segment.with-tags{
+        min-height: 30em;
+    }
+
+    div.ui.vertical.stripe.segment > div > div.ui.stackable.four.column.grid{
+        padding: 1.5em 0;
+    }
+}
+
+.ui.image {
+    width: 45px;
+    margin-right: 0.7em;
+}
+
+#menu > a > i {
+    color: #00B5AD;
+}
+
+.following.bar {
+    padding: .5em 0em;
+    background-color: #FFFFFF;
+    border-bottom: 2px solid #DDDDDD;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.04);
+    position: fixed;
+    top: 0px;
+    z-index: 900;
+    left: 0%;
+    width: 100%;
+}
+
+body > div.pusher > div > div.stripe {
+    background-color: #FFFFFF;
+    padding-top: 6em;
+    border-radius: 0em;
+    margin: 0em;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+.ui.menu .item > i.icon {
+    opacity: 0.9;
+    float: none;
+    margin: 0em 0em 0em 0em;
+}
+
+.site-info {
+    width: 100%;
+    color: inherit;
+    text-align: center;
+    font-size: 0.90em;
+    padding-bottom: 30px;
+    padding-top: 40px;
+    background-color: #FFFFFF;
+    border-top: 1px solid #DDDDDD;
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.04);
+}
+
+.paginator {
+    text-align: center;
+    border: 0;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.04);
+    padding-bottom: 2em;
+    padding-top: 3em;
+}
+
+.site-info .split {
+    margin: 0 2px;
+}
+
+.school-name {
+    height: 3em;
+}
+
+div.course.item > div > a > h3 {
+    height: 3em;
+}
+
+g.highcharts-button {
+    display: none;
+}
+
+svg > text {
+    display: None;
+}
+
+.highcharts-grid {
+    display: None;
+}
+
+.stripe .column > p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 1em 0em;
+}
+
+div.ui.stackable.very.relaxed.center.aligned.grid.container > div:nth-child(1) > div > h1 {
+    font-size: 3em;
+}
+
+::selection {
+    background: #222;
+    color: white;
+}
+
+
+.quote {
+    position: relative;
+    margin-top: 3em;
+    margin-bottom: 8em;
+    color: #666;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.quote::before, .quote::after {
+    position: absolute;
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 24px;
+    opacity: 0.2;
+}
+
+.quote::before {
+    top: -20px;
+    border-top: 1px solid #ccc;
+    background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB3aWR0aD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDM0aDZsNC04di0xMmgtMTJ2MTJoNnptMTYgMGg2bDQtOHYtMTJoLTEydjEyaDZ6Ii8+PHBhdGggZD0iTTAgMGg0OHY0OGgtNDh6IiBmaWxsPSJub25lIi8+PC9zdmc+") no-repeat 0 -7px;
+    background-size: 24px 24px;
+}
+
+.quote::after {
+    border-bottom: 1px solid #ccc;
+    background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB3aWR0aD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDM0aDZsNC04di0xMmgtMTJ2MTJoNnptMTYgMGg2bDQtOHYtMTJoLTEydjEyaDZ6Ii8+PHBhdGggZD0iTTAgMGg0OHY0OGgtNDh6IiBmaWxsPSJub25lIi8+PC9zdmc+") no-repeat 100% 7px;
+    background-size: 24px 24px;
+}
+
+.quote cite::before {
+    content: "-";
+    padding: 0 5px;
+}
+
+.quote p, .quote div {
+    text-align: center
+}
+
+.animate-init {
+    position: relative;
+    top: -10px;
+    opacity: 0;
+}
+
+div.ui.stackable.very.relaxed.center.aligned.grid.container > div > div > div.header{
+    margin-top: 8em;
+}
+
+div.row.animate-init{
+    margin-top: 3em;
+    margin-bottom: 3em;
+}
+
+.ui.statistic > .label{
+    text-align: left;
+}
+
+h2.ui.icon.header > img.ui.icon.image{
+    height: .8em;
+    margin-bottom: 20px;
+}
+
+div.ui.three.column.center.aligned.divided.very.relaxed.stackable.grid.container{
+    margin: 4em 0;
+}
+
+form > div > label{
+    text-align: left;
+}
+
+h1.ui.title.recommend{
+    margin-bottom: 2em;
+}
+
+div.image.content > div.ui.medium.image{
+    min-width: 200px;
+}
+
+#recommend-content{
+    min-height: 500px;
+    padding: 2em 0;
+}
+
+

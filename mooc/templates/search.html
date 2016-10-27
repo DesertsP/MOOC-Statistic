@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container" style="min-height: 450px">
+            {% if error %}
+                <div class="ui stackable center aligned grid container">
+                    <div class="ten wide row">
+                        <div class="ui negative message" style="margin-top: 13em">
+                            <div class="header">对不起，找不到您要的课程！</div>
+                            <p> 建议更换关键字重新搜索 </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if not error and not courses.has_previous %}
+                <div class="ui stackable four column grid">
+                    <div class="column">
+                        <div class="ui blue segment">
+                            <div class="ui statistic">
+                                <div class=" value">
+                                    {{ count }}
+                                </div>
+                                <div class="label">
+                                    搜索结果
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui purple segment">
+                            <div class="ui statistic">
+                                <div class=" value">
+                                    {{ zh_count }}
+                                </div>
+                                <div class="label">
+                                    中文授课
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui teal segment">
+                            <div class="ui statistic">
+                                <div class="value">
+                                    {{ max_grading }}
+                                </div>
+                                <div class="label">
+                                    最高评分
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui red segment">
+                            <div class="ui statistic">
+                                <div class="value">
+                                    {{ max_follow }}
+                                </div>
+                                <div class="label">
+                                    最高关注
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="ui divider"></div>
+            {% endif %}
+            <div class="ui stackable four column grid">
+                {% for course in courses %}
+                    <div class="column">
+                        <div class="ui segment with-tags">
+                            <div class="ui items">
+                                <div class="ui small teal right ribbon label">
+                                    {{ course.grading }}
+                                    <i class="star icon"></i>
+                                    {{ course.followers_count }}
+                                    <i class="heart icon"></i>
+                                    <span class="ui-icon-blank"></span>
+                                </div>
+                                <div class="ui small top left attached label">
+                                    {{ course.get_department }}
+                                </div>
+                                <div class="course item">
+                                    <div class="content">
+                                        <a class="detail" id="{{ course.pk }}">
+                                            <h3 class="ui dividing header">
+                                                {% if course.chinese_name %}
+                                                    {{ course.chinese_name }}
+                                                {% else %}
+                                                    {{ course.name }}
+                                                {% endif %}
+                                            </h3>
+                                            <div class="description">
+                                                <img src="{{ course.icon_url }}"/>
+                                            </div>
+                                        </a>
+                                        <div class="ui divider"></div>
+                                        <div class="text-center">
+                                            <div class="item school-name">
+                                                <i class="university icon"></i>
+                                                {{ course.school }}
+
+                                            </div>
+                                        </div>
+                                        <div class="ui modal" id="{{ course.pk }}-modal">
+                                            <i class="close icon"></i>
+                                            <div class="header">
+                                                {{ course.name }} 课程简介
+                                            </div>
+                                            <div class="image content">
+                                                <div class="ui medium image">
+                                                    <img src="{{ course.icon_url }}">
+                                                </div>
+                                                <div class="description">
+                                                    <p>
+                                                        <b>平台: </b>{{ course.platform }}&nbsp;|&nbsp;
+                                                        <b>难度: </b>{{ course.get_difficulty_display }}&nbsp;|&nbsp;
+                                                        <b>教师: </b>
+                                                        {% for t in course.teachers.all.distinct %}
+                                                            {{ t }} &nbsp;&nbsp;
+                                                        {% endfor %}
+                                                    </p>
+                                                    <div class="ui divider"></div>
+                                                    <p>{{ course.introduction | truncatechars_html:300 | safe }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="actions">
+                                                <div class="ui black deny button">
+                                                    不感兴趣
+                                                </div>
+                                                <a href="{{ course.url }}" target="_blank">
+                                                    <div class="ui positive right labeled icon button">
+                                                        恩, 我去看看
+                                                        <i class="checkmark icon"></i>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if courses.paginator.num_pages > 1 %}
+                <div class="paginator">
+                    <div class="ui pagination menu">
+                        {% if courses.has_previous %}
+                            <a href="?q={{ keyword | safe }}&page={{ courses.previous_page_number }}" class="item">
+                                <i class="chevron left icon"></i>
+                            </a>
+                        {% else %}
+                            <a class="disabled item">
+                                <i class="chevron left icon"></i>
+                            </a>
+                        {% endif %}
+                        {% if courses.paginator.num_pages > 3 %}
+                            <a href="?q={{ keyword | safe }}&page=1" class="item">
+                                1
+                            </a>
+                            <a href="?q={{ keyword | safe }}&page=2" class="item">
+                                2
+                            </a>
+                            <a class="disabled item">
+                                ...
+                            </a>
+                            <a href="?q={{ keyword | safe }}&page={{ courses.paginator.num_pages }}" class="item">
+                                {{ courses.paginator.num_pages }}
+                            </a>
+                        {% else %}
+                            <a class="disabled item">
+                                ...
+                            </a>
+                        {% endif %}
+
+                        {% if courses.has_next %}
+                            <a href="?q={{ keyword | safe }}&page={{ courses.next_page_number }}" class="item">
+                                <i class="chevron right icon"></i>
+                            </a>
+                        {% else %}
+                            <a class="disabled item">
+                                <i class="chevron right icon"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $('.detail').click(function () {
+            $('#' + this.id + '-modal').modal('show');
+        });
+    </script>
+{% endblock %}

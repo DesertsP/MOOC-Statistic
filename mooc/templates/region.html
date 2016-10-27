@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/proj4.js' %}"></script>
+    <script src="{% static 'js/highmaps.js' %}"></script>
+    <script src="{% static 'js/exporting.js' %}"></script>
+    <script src="{% static 'js/data.js' %}"></script>
+    <script src="{% static 'js/world.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="ui vertical stripe segment">
+        <div class="ui container">
+            <div class="ui stackable four column grid">
+                <div class="column">
+                    <div class="ui blue segment">
+                        <div class="ui statistic">
+                            <div class=" value">
+                                {{ course_total }}
+                            </div>
+                            <div class="label">
+                                课程
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui purple segment">
+                        <div class="ui statistic">
+                            <div class="value">
+                                {{ school_total }}
+                            </div>
+                            <div class="label">
+                                院校/机构
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui teal segment">
+                        <div class="ui statistic">
+                            <div class="value">
+                                {{ country_total }}
+                            </div>
+                            <div class="label">
+                                国家
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui red segment">
+                        <div class="ui statistic">
+                            <div class="value">
+                                {{ lang_total }}
+                            </div>
+                            <div class="label">
+                                语言
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="ui divider"></div>
+            <div class="ui stackable very relaxed center aligned grid container">
+                <div class="row">
+                    <h1 class="ui title">慕课在地理上的分布和发展状况分析<sup>*</sup></h1>
+                </div>
+                <div class="row">
+                    <div class="seven wide column" style="text-align: right">
+                        <div class="ui teal buttons">
+                            <div class="ui button">选择地图</div>
+                            <div class="ui floating dropdown icon button">
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <div class="item" id="school_map">慕课学校分布</div>
+                                    <div class="item" id="country_map">慕课国别分布</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="row">
+                    <div class="fourteen wide column">
+                        <div class="ui container" style="height: 600px;" id="map"></div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="row">
+                    <div class="twelve wide column" style="text-align: left; padding-top: 0">
+                        <p>
+                            <sub>*课程由中国地区用户收集，并不不代表全球真实数据.<br>
+                                由于地图API的缘故，少数国外大学被错误标注在中国大陆, <br>由此带来中国大陆课程数偏高的误差.
+                            </sub>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        load_country();
+        $('#school_map').click(load_school);
+        $('#country_map').click(load_country);
+        function load_country() {
+            $.getJSON('country?json', function (data) {
+                $.each(data, function () {
+                    if (this.school__country === 'UK') {
+                        this.school__country = 'GB';
+                    }
+                });
+                $('#map').highcharts('Map', {
+                    chart: {
+                        map: 'custom/world'
+                    },
+
+                    title: {
+                        text: '慕课数量在地理上的分布统计'
+                    },
+
+                    subtitle: {
+                        text: '数据来源: 果壳慕课 | 课程由中国地区用户收集，不代表全球真实数据'
+                    },
+
+                    legend: {
+                        enabled: false
+                    },
+
+                    mapNavigation: {
+                        enabled: true,
+                        buttonOptions: {
+                            verticalAlign: 'bottom'
+                        }
+                    },
+
+                    series: [{
+                        name: 'Countries',
+                        color: '#00B5AD',
+                        enableMouseTracking: true
+                    }, {
+                        type: 'mapbubble',
+                        name: '慕课数量',
+                        joinBy: ['iso-a2', 'school__country'],
+                        data: data,
+                        minSize: 4,
+                        maxSize: '30%',
+                        tooltip: {
+                            pointFormat: '{point.school__country}: {point.z} 门课程'
+                        }
+                    }]
+                });
+
+            });
+        }
+
+        function load_school() {
+            $.getJSON('geo?json', function (data) {
+                $('#map').highcharts('Map', {
+                    title: {
+                        text: '学校分布'
+                    },
+
+                    mapNavigation: {
+                        enabled: true
+                    },
+
+                    tooltip: {
+                        headerFormat: '',
+                        pointFormat: '<b>{point.name}</b><br>Lat: {point.lat}, Lon: {point.lon}'
+                    },
+
+                    series: [{
+                        mapData: Highcharts.maps['custom/world'],
+                        name: 'Basemap',
+                        showInLegend: false
+                    }, {
+                        type: 'mappoint',
+                        name: '学校',
+                        color: '#7cb5ec',
+                        showInLegend: false,
+                        data: data
+                    }]
+                })
+            });
+        }
+
+    </script>
+    <script>
+        $('.dropdown')
+                .dropdown({
+                    transition: 'drop'
+                })
+        ;
+    </script>
+{% endblock %}
